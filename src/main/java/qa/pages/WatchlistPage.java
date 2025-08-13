@@ -3,10 +3,7 @@ package qa.pages;
 import org.openqa.selenium.By;
 import qa.base.BaseTest;
 import org.openqa.selenium.support.PageFactory;
-import qa.commonfuctions.BrowserAlertHandler;
-import qa.commonfuctions.Constants;
-import qa.commonfuctions.NewTabsSetUp;
-import qa.commonfuctions.RunTimeDataStore;
+import qa.commonfuctions.*;
 import qa.helperClass.SeleniumHelper;
 import qa.utils.ReportUtil;
 
@@ -26,16 +23,21 @@ public class WatchlistPage extends BaseTest {
 
     BrowserAlertHandler browserAlertHandler = new BrowserAlertHandler();
 
-    public static final By WebElement_Watchlist_Name_Link = By.xpath("//*[text()='Stocks in ']//*[1]");
-    public static final By WebElement_Selected_Watchlist_SubTab = By.xpath("//*[@role='presentation' and @class= 'active']//*[text()='Watchlist']");
-    public static final By WebElement_Choose_File_Button = By.xpath("//input[@name='file']");
-    public static final By WebElement_Upload_Button = By.xpath("//button[@type='submit' and text()='Upload']");
-    public static final By WebElement_Empty_Watchlist_Button = By.xpath("//*[contains(@class,'warning') and text()= 'Empty watchlist']");
+    public static final By WebElement_Watchlist_Name_Link = By.xpath("//*[@aria-current='page']");
+    public static final By WebElement_Selected_Watchlist_SubTab = By.xpath("//*[@href='/watchlist_dashboard' and contains(@class,'dark')]");
+    public static final By WebElement_Choose_File_Button = By.xpath("(//*[ contains(@class,'button') ] [contains (text(), 'Select a file') ] )[1]");
+    public static final By WebElement_Upload_Button = By.xpath("(//*[ contains(@class,'button') ] //*[contains (text(), 'Upload') ] )[1]");
+    public static final By WebElement_Empty_Watchlist_Button = By.xpath("//*[text()= 'Empty watchlist']");
     public static final By WebElement_Success_Message = By.xpath("//*[contains(@class,'success alert')]");
-    public static final By WebElement_NoDataAvailableInTable_Message = By.xpath("//*[contains(@class,'empty') and text()= 'No data available in table']");
-    public static final By WebElement_Stock_Search_Textbox = By.xpath("//input[@type='search']");
+    //public static final By WebElement_NoDataAvailableInTable_Message = By.xpath("//*[contains(@class,'empty') and text()= 'No data available in table']");
+    public static final By WebElement_NoStocksOnWatchlist_Message = By.xpath("//*[text()='No stocks on watchlist']");
+    public static final By WebElement_Stock_Search_Textbox = By.xpath("//*[@id ='watchlist-stocks']");
     public static final By WebElement_NoMatchingRecordsFoundInTable_Message = By.xpath("//*[contains(@class,'empty') and text()= 'No matching records found']");
-    public static final String Xpath_Stock_Remove_Link= "//*[contains(@onclick,'%s') and text()= 'Remove']";
+   // public static final String Xpath_Stock_Remove_Link= "//*[contains(@onclick,'%s') and text()= 'Remove']";
+    public static final String Xpath_Stock_Remove_Link= "//*[text()='%s']//..//..//*[text()='Remove']";
+
+    public static final By WebElement_PopUp_Ok_Button = By.xpath("//*[@role='dialog']//*[contains(text(),'Ok')]");
+
 
     public WatchlistPage() {
         PageFactory.initElements(driver, this);
@@ -46,14 +48,23 @@ public class WatchlistPage extends BaseTest {
         return helper.isElementVisible(WebElement_Success_Message);
     }
 
-    public boolean isElement_NoDataAvailableInTable_Message_Visible() {
-        return helper.isElementVisible(WebElement_NoDataAvailableInTable_Message);
+    public boolean isElement_NoStocksOnWatchlist_Message_Visible() {
+        //  return helper.isElementVisible(WebElement_NoDataAvailableInTable_Message);
+        //to avoid implicit wait
+        return helper.safeFindElement(WebElement_NoStocksOnWatchlist_Message,0);
     }
     public boolean isElement_NoMatchingRecordsFoundInTable_Message_Visible() {
-        return helper.isElementVisible(WebElement_NoMatchingRecordsFoundInTable_Message);
+//        return helper.isElementVisible(WebElement_NoMatchingRecordsFoundInTable_Message);
+        //to avoid implicit wait
+        return helper.safeFindElement(WebElement_NoMatchingRecordsFoundInTable_Message, 0);
     }
     public static By get_WebElement_Of_Stock_Remove_Link(String stock_Name) {
         return By.xpath(String.format(Xpath_Stock_Remove_Link, stock_Name));
+    }
+
+    // Adding special case for OIL Stock
+    public boolean is_WebElement_Of_Stock_Remove_Link_Visible(By webElement) {
+        return helper.safeFindElement(webElement, 0);
     }
     public void click_On_Stock_Remove_Link(String stock_Name) {
         helper.safeClick(get_WebElement_Of_Stock_Remove_Link(stock_Name));
@@ -61,6 +72,11 @@ public class WatchlistPage extends BaseTest {
     public void click_Choose_File_Button() {
 //        helper.safeClick(WebElement_Choose_File_Button);
         helper.forceClickByJavaScript(WebElement_Choose_File_Button);
+    }
+    public void click_On_Popup_Ok_Button() throws InterruptedException {
+        Thread.sleep(500);
+        helper.safeClick(WebElement_PopUp_Ok_Button);
+        Thread.sleep(500);
     }
     public void click_Empty_Watchlist_Button() {
         helper.safeClick(WebElement_Empty_Watchlist_Button);
@@ -151,6 +167,40 @@ public class WatchlistPage extends BaseTest {
         return flag;
     }
 
+    public boolean upload_Stock_List_TextFile_Using_Robot(String File_Location){
+
+        ReportUtil.report(true, "INFO", "-- Function -- Starting -- upload_Stock_List_TextFile_Using_Robot function ","");
+
+        boolean flag= false;
+
+        try {
+
+            helper.safeClick(WebElement_Choose_File_Button);
+            FileUploadWithRobot.uploadFile(File_Location);
+//            FileUploadWithRobot.uploadFile("C:\\Users\\prath\\IdeaProjects\\ChartInk_ST1_And_ST2_Combined_Project_New\\src\\main\\resources\\data\\runTime_Stocks_for_ST2_Cndt2.txt");
+            // Wait to ensure file upload completes
+
+            Thread.sleep(1000);
+
+            this.click_Upload_Button();
+            Thread.sleep(1000);
+            //this.isElement_Success_Message_Visible();
+
+            this.click_On_Popup_Ok_Button();
+
+            ReportUtil.report( true, "PASS", "Text file ",  "'"+File_Location + "' uploaded successfully.");
+
+        }catch (Exception e) {
+
+            System.out.println("upload_Stock_List_TextFile: " + e.getMessage());
+            ReportUtil.report( false, "FAIL", "upload_Stock_List_TextFile_Using_Robot, ",  e.getMessage());
+        }
+
+        ReportUtil.report(true, "INFO", "-- Function -- Ending -- upload_Stock_List_TextFile_Using_Robot function ", "");
+
+        return flag;
+    }
+
     public boolean upload_Stock_List_TextFile(String File_Location){
 
         ReportUtil.report(true, "INFO", "-- Function -- Starting -- upload_Stock_List_TextFile function ","");
@@ -229,14 +279,14 @@ public class WatchlistPage extends BaseTest {
 
                     this.navigate_to_Particular_Watchlist(Constants.TAB_DEFAULT_WATCHLIST_PAGE, watchlist_Url, watchlist_Name);
 
-                    if (this.isElement_NoDataAvailableInTable_Message_Visible()) {
+                    if (this.isElement_NoStocksOnWatchlist_Message_Visible()) {
                         System.out.println("Watchlist " + i + ": " + watchlist_Name + " is already empty ");
                         ReportUtil.report(true, "INFO", "Watchlist " + i + ": " + watchlist_Name + " is already empty ", "");
                     } else {
                         this.click_Empty_Watchlist_Button();
                         browserAlertHandler.click_Ok();
                         Thread.sleep(500);
-                        ReportUtil.report(this.isElement_NoDataAvailableInTable_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
+                        ReportUtil.report(this.isElement_NoStocksOnWatchlist_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
 
                     }
                 }
@@ -251,14 +301,14 @@ public class WatchlistPage extends BaseTest {
             watchlist_Url = ST2_Cndt3_watchlist_Url;
 
             this.navigate_to_Particular_Watchlist(Constants.TAB_DEFAULT_WATCHLIST_PAGE, watchlist_Url, watchlist_Name);
-            if (this.isElement_NoDataAvailableInTable_Message_Visible()){
+            if (this.isElement_NoStocksOnWatchlist_Message_Visible()){
                 System.out.println("Watchlist " + i + ": " + watchlist_Name + " is already empty ");
                 ReportUtil.report(true, "INFO", "Watchlist " + i + ": " + watchlist_Name + " is already empty ", "");
             }else {
                 this.click_Empty_Watchlist_Button();
                 browserAlertHandler.click_Ok();
                 Thread.sleep(500);
-                ReportUtil.report(this.isElement_NoDataAvailableInTable_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
+                ReportUtil.report(this.isElement_NoStocksOnWatchlist_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
 
             }
 
@@ -279,24 +329,25 @@ public class WatchlistPage extends BaseTest {
                 "Watchlist Name : '" + Watchlist_Name + "' ,Watchlist_url : '"+ Watchlist_Url + "', Stock name '" + StockName + "'.");
 
         this.navigate_to_Particular_Watchlist(Tab_Name, Watchlist_Url, Watchlist_Name);
-
+        String stockFullName = "";
         try {
-                this.send_Text_To_Stock_Search_Textbox(StockName);
-                if (this.isElement_NoMatchingRecordsFoundInTable_Message_Visible()) {
-                    System.out.println("Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'");
-                    ReportUtil.report(true, "INFO", "Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'", "");
-                } else {
+            this.send_Text_To_Stock_Search_Textbox(StockName);
+            stockFullName = fAndOStocksprop.getProperty(StockName).trim();
 
-                    Thread.sleep(500);
-                    this.click_On_Stock_Remove_Link(StockName);
-                    Thread.sleep(500);
-                    browserAlertHandler.click_Ok();
-                    Thread.sleep(500);
-                    browserAlertHandler.click_Ok();
-                    System.out.println("Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ");
-                    ReportUtil.report(this.isElement_NoDataAvailableInTable_Message_Visible(), "PASS",
-                            "Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ", "");
-                }
+            if (this.isElement_NoStocksOnWatchlist_Message_Visible()) {
+                System.out.println("Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'");
+                ReportUtil.report(true, "INFO", "Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'", "");
+            } else {
+
+                Thread.sleep(500);
+                this.click_On_Stock_Remove_Link(stockFullName);
+                Thread.sleep(500);
+                browserAlertHandler.click_Ok();
+
+                System.out.println("Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ");
+                ReportUtil.report(this.isElement_NoStocksOnWatchlist_Message_Visible(), "PASS",
+                        "Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ", "");
+            }
 
         } catch (Exception e) {
 
@@ -315,33 +366,40 @@ public class WatchlistPage extends BaseTest {
                         " Stock names '" + String.join(", ", StockNames) + "'.");
 
         String[] stocks = StockNames;
+        String stockFullName = "";
 
         this.navigate_to_Particular_Watchlist(Tab_Name, Watchlist_Url, Watchlist_Name);
 
         for (String StockName : stocks) {
             try {
                 StockName = StockName.trim();
-                this.send_Text_To_Stock_Search_Textbox(StockName);
-                if (this.isElement_NoMatchingRecordsFoundInTable_Message_Visible()) {
+
+                //get stock full name
+                stockFullName = fAndOStocksprop.getProperty(StockName).trim();
+
+                this.send_Text_To_Stock_Search_Textbox(stockFullName);
+                Thread.sleep(100);
+                if (this.isElement_NoStocksOnWatchlist_Message_Visible()) {
                     System.out.println("Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'");
                     ReportUtil.report(true, "INFO", "Stock : '" + StockName + "' not found in watchlist '" + Watchlist_Name + "'", "");
-                } else {
+                }  else {
 
-                    this.click_On_Stock_Remove_Link(StockName);
-                    Thread.sleep(500);
+                    this.click_On_Stock_Remove_Link(stockFullName);
+                    Thread.sleep(1000);
                     browserAlertHandler.click_Ok();
-                    Thread.sleep(500);
-                    browserAlertHandler.click_Ok();
+//                    Thread.sleep(1000);
+//                    browserAlertHandler.click_Ok();
                     System.out.println("Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ");
                     ReportUtil.report(true, "PASS",
                             "Stock '" + StockName + "' removed from Watchlist '" + Watchlist_Name + "' ", "");
                 }
 
+
             } catch (Exception e) {
 
                 System.out.println("delete_Stock_From_Watchlist: " + e.getMessage());
                 ReportUtil.report( false, "FAIL", "delete_Stock_From_Watchlist, ",  e.getMessage()+
-                            ": Not able to remove Stock '" + StockName + "' from Watchlist '" + Watchlist_Name + "'" );
+                        ": Not able to remove Stock '" + StockName + "' from Watchlist '" + Watchlist_Name + "'" );
             }
         }
         ReportUtil.report(true, "INFO", "-- Function -- Ending -- delete_Stock_From_Watchlist function ","" );
@@ -389,14 +447,14 @@ public class WatchlistPage extends BaseTest {
 
                     this.navigate_to_Particular_Watchlist(Constants.TAB_DEFAULT_WATCHLIST_PAGE, watchlist_Url, watchlist_Name);
 
-                    if (this.isElement_NoDataAvailableInTable_Message_Visible()) {
+                    if (this.isElement_NoStocksOnWatchlist_Message_Visible()) {
                         System.out.println("Watchlist " + i + ": " + watchlist_Name + " is already empty ");
                         ReportUtil.report(true, "INFO", "Watchlist " + i + ": " + watchlist_Name + " is already empty ", "");
                     } else {
                         this.click_Empty_Watchlist_Button();
                         browserAlertHandler.click_Ok();
                         Thread.sleep(500);
-                        ReportUtil.report(this.isElement_NoDataAvailableInTable_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
+                        ReportUtil.report(this.isElement_NoStocksOnWatchlist_Message_Visible(), "PASS", "Watchlist " + i + ": " + watchlist_Name + " is empty now", "");
 
                     }
                 }

@@ -2,20 +2,21 @@ package qa.pages;
 
 import org.openqa.selenium.By;
 import qa.base.BaseTest;
-import qa.commonfuctions.Constants;
-import qa.commonfuctions.NewTabsSetUp;
+import qa.commonfuctions.*;
 import qa.utils.ReportUtil;
 import org.openqa.selenium.support.PageFactory;
 import qa.helperClass.SeleniumHelper;
-import qa.commonfuctions.FileAndFolderFunctions;
-import qa.commonfuctions.DateTimeFunctions;
+
+import java.time.LocalDate;
 
 public class AlertPage extends BaseTest {
 
     SeleniumHelper helper;
     NewTabsSetUp newTabsSetUp = new NewTabsSetUp();
-    public static final By WebElement_Alert_Name_Link = By.xpath("//*[contains(text(),'Triggers for')]");
-    public static final By WebElement_Copy_Button = By.xpath("//*[contains(@class,'copy buttons')]");
+    public static final By WebElement_Alert_Name_Link = By.xpath("//*[contains(text(),'Trigger')]");
+    public static final By WebElement_Copy_Button = By.xpath("//*[contains(text(),'Copy')]");
+
+    public static final By WebElement_PopUp_Ok_Button = By.xpath("//*[@role='dialog']//*[contains(text(),'Ok')]");
 
 //    By emailLoginField = By.id("email");
 //    By chartInkWebpage = By.xpath("//*[@href='https://chartink.com/']");
@@ -39,6 +40,11 @@ public class AlertPage extends BaseTest {
        // helper.forceClickByJavaScript(WebElement_Copy_Button);
         Thread.sleep(1000);
     }
+    public void click_On_Popup_Ok_Button() throws InterruptedException {
+        Thread.sleep(500);
+        helper.safeClick(WebElement_PopUp_Ok_Button);
+        Thread.sleep(500);
+    }
 
     public boolean verify_And_Get_Latest_Alert_Displayed_For_ST2_Cndt1() throws InterruptedException {
 
@@ -57,6 +63,8 @@ public class AlertPage extends BaseTest {
 
                 //Click on Copy button
                 this.click_On_Copy_Button();
+                this.click_On_Popup_Ok_Button();
+
                 //Paste to run time data file for reading the Alerts
                 FileAndFolderFunctions.paste_Copied_Data_To_Text_File(Constants.TEXTFILE_PATH_FOR_COPY_PASTED_ALERTS_OUTPUT_OF_ST2_CNDT1);
 
@@ -90,7 +98,11 @@ public class AlertPage extends BaseTest {
         }
         ReportUtil.report( true, "INFO", "-- Function -- Ending -- verify_And_Get_Latest_Alert_Displayed_For_ST2_Cndt1 function",  "");
 
-        return new_Alert_Displayed;
+        //return new_Alert_Displayed;
+        Constants.ST2_CNDT1_DEFAULT_ALERT_TIMESTAMP = latest_Alert_TimeStamp;
+        Constants.ST2_CNDT1_LATEST_ALERT_TIMESTAMP = latest_Alert_TimeStamp;
+        Constants.ST2_CNDT1_LATEST_ALERT_STOCK_NAMES= latest_Alert_Stock_Names ;
+        return true;
     }
 
     public boolean verify_And_Get_Latest_Alert_Displayed_For_ST2_Cndt2() throws InterruptedException {
@@ -110,6 +122,8 @@ public class AlertPage extends BaseTest {
 
                 //Click on Copy button
                 this.click_On_Copy_Button();
+                this.click_On_Popup_Ok_Button();
+
                 //Paste to run time data file for reading the Alerts
                 FileAndFolderFunctions.paste_Copied_Data_To_Text_File(Constants.TEXTFILE_PATH_FOR_COPY_PASTED_ALERTS_OUTPUT_OF_ST2_CNDT2);
 
@@ -208,19 +222,24 @@ public class AlertPage extends BaseTest {
         try {
             // To get the Alert date time stamp
 
-            // Example Output: Tue Jul 8 2025, 1:05 pm	2	HINDUNILVR, KALYANKJIL
+            // Outdated Example Output: Tue Jul 8 2025, 1:05 pm	2	HINDUNILVR, KALYANKJIL
+            // New Example Output: Fri, Aug 8, 2025 11:55 AM	2	CONCOR, CUMMINSIND
             String[] lines = Stock_Data.split("\\n");
 
             // Example Output: Tue Jul 8 2025, 1:05
-            String[] date_parts = lines[1].split("(?i)\\s*(am|pm)\\s*");
+            String[] date_parts = lines[0].split("(?i)\\s*(AM|PM)\\s*");
+
+            final_Date = date_parts[0].replaceFirst(",", "").replaceFirst(",", "");
 
             //To construct final date
-            if (lines[1].contains(" am")){
-                final_Date = date_parts[0] + " AM";
+            if (lines[0].contains(" AM")){
+                final_Date = final_Date + " AM";
             }else {
-                final_Date = date_parts[0] + " PM";
+                final_Date = final_Date + " PM";
             }
 
+            String current_Year= Integer.toString(LocalDate.now().getYear());
+            final_Date =final_Date.replace(current_Year, current_Year+',');
 
             System.out.println("Latest alert TimeStamp : "+ final_Date);
             ReportUtil.report( true, "INFO", "Latest alert TimeStamp :, ",  final_Date);
@@ -248,7 +267,7 @@ public class AlertPage extends BaseTest {
             String[] lines = Stock_Data.split("\\n");
 
             // Example Output: HINDUNILVR, KALYANKJIL
-            String[] parts = lines[1].split("\\t");
+            String[] parts = lines[0].split("\\t");
             final_Stocks = parts[2];
 
             System.out.println("Latest alert stock names : "+ final_Stocks);

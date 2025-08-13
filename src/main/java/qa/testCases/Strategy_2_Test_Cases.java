@@ -73,8 +73,8 @@ public class Strategy_2_Test_Cases extends BaseTest {
                     Constants.DATA_FOLDER_PATH, Constants.TEXTFILE_NAME_FOR_NEXYDAY_CARRY_FORWARD_STOCKS_OF_ST2_CNDT2);
 
             //        Commenting below for time being , to be work on later
-    //        Constants.TEXTFILE_PATH_ST1_CNDT2_ALERTS = FileAndFolderFunctions.Create_A_TextFile(Constants.FOLDER_SUB_OUTPUT+ "\\", Constants.TEXTFILE_NAME_ST1_CNDT2_ALERTS);
-    //        Constants.TEXTFILE_PATH_ST1_CNDT3_ALERTS = FileAndFolderFunctions.Create_A_TextFile(Constants.FOLDER_SUB_OUTPUT+ "\\", Constants.TEXTFILE_NAME_ST1_CNDT3_ALERTS);
+            //        Constants.TEXTFILE_PATH_ST1_CNDT2_ALERTS = FileAndFolderFunctions.Create_A_TextFile(Constants.FOLDER_SUB_OUTPUT+ "\\", Constants.TEXTFILE_NAME_ST1_CNDT2_ALERTS);
+            //        Constants.TEXTFILE_PATH_ST1_CNDT3_ALERTS = FileAndFolderFunctions.Create_A_TextFile(Constants.FOLDER_SUB_OUTPUT+ "\\", Constants.TEXTFILE_NAME_ST1_CNDT3_ALERTS);
 
             // </editor-fold>
 
@@ -165,7 +165,7 @@ public class Strategy_2_Test_Cases extends BaseTest {
                             Constants.ST2_CNDT2_CURRENT_RUN_WATCHLIST_NAME);
 
                     //Upload Stocks text file
-                    watchlistPage.upload_Stock_List_TextFile(Constants.TEXTFILE_PATH_FOR_RUNTIME_STOCKS_FOR_ST2_CNDT2_WATCHLIST);
+                    watchlistPage.upload_Stock_List_TextFile_Using_Robot(Constants.TEXTFILE_PATH_FOR_RUNTIME_STOCKS_FOR_ST2_CNDT2_WATCHLIST);
 
                     // Update Stock Alerts to  output textfile for end of the day validation
                     FileAndFolderFunctions.update_Output_Text_File_for_Alert_Results(Constants.TEXTFILE_PATH_ST2_CNDT2_WATCHLIST_UPDATES,
@@ -180,7 +180,7 @@ public class Strategy_2_Test_Cases extends BaseTest {
                     newTabsSetUp.navigateToTab(Constants.TAB_WATCHLISTPAGE_NAME_ST_2_Cndt_3_Watchlist);
 
                     //Upload Stocks text file
-                    watchlistPage.upload_Stock_List_TextFile(Constants.TEXTFILE_PATH_FOR_RUNTIME_STOCKS_FOR_ST2_CNDT3_WATCHLIST);
+                    watchlistPage.upload_Stock_List_TextFile_Using_Robot(Constants.TEXTFILE_PATH_FOR_RUNTIME_STOCKS_FOR_ST2_CNDT3_WATCHLIST);
 
                     // Update Stock Alert to  output textfile for end of the day validation
                     FileAndFolderFunctions.update_Output_Text_File_for_Alert_Results(Constants.TEXTFILE_PATH_ST2_CNDT3_WATCHLIST_UPDATES,
@@ -203,7 +203,7 @@ public class Strategy_2_Test_Cases extends BaseTest {
 
                     // Create an array to pass to delete_Stock_From_Watchlist function
                     if (ST2_CNDT2_Alerts_Stock_Names.contains(",")) {
-                         stocks = ST2_CNDT2_Alerts_Stock_Names.split(",");
+                        stocks = ST2_CNDT2_Alerts_Stock_Names.split(",");
                     }else {
                         stocks = new String[]{ST2_CNDT2_Alerts_Stock_Names};
                     }
@@ -315,7 +315,7 @@ public class Strategy_2_Test_Cases extends BaseTest {
                 // To ensure for loop starts at the next multiple of 5 minutes 25 seconds,
                 // such as 9:25:05, even if the program is started at 9:23:00
                 if (i < loop_Count && ("true".equalsIgnoreCase(prop.getProperty("Wait_For_Precise_5min_25Sec_Time_Interval").trim()))) {
-                        DateTimeFunctions.loop_At_Precise_Time_Intervals();
+                    DateTimeFunctions.loop_At_Precise_Time_Intervals();
                 }
 
                 // Break loop if current time is past 3:35 PM
