@@ -36,7 +36,9 @@ public class BaseTest {
     public static ChromeOptions options = new ChromeOptions();
     public static WebDriver driver;
     public static Properties prop;
+    public static Properties fAndOStocksprop;
     public static InputStream fileInputStream;
+    public static InputStream fAndOfileInputStream;
 
     @BeforeTest
     public void setup() throws IOException {
@@ -52,12 +54,29 @@ public class BaseTest {
             prop = new Properties();
             prop.load(fileInputStream);
 
+            //read F&O config  file
+            String fAndOStocksFilePath = System.getProperty("user.dir") + "/src/main/resources/data/FAndO_Stocks_Detail.properties";
+            System.out.println(fAndOStocksFilePath);
+            fAndOfileInputStream = new FileInputStream(fAndOStocksFilePath);
+
+            // load properties file in Properties
+            fAndOStocksprop = new Properties();
+            fAndOStocksprop.load(fAndOfileInputStream);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
             if (fileInputStream != null) {
                 try {
                     fileInputStream.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (fAndOStocksprop != null) {
+                try {
+                    fAndOfileInputStream.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -96,6 +115,8 @@ public class BaseTest {
         //Set watchlist data for statergy ST1_Cndt2
         RunTimeDataStore.ST2_Cndt2_Watchlists_Details.update_All_Watchlist_Data(Constants.TEXTFILE_PATH_FOR_ST2_CNDT2_WATCHLISTS_NAME_AND_URL);
 
+        //Set F_AND_O_STOCKS_DETAILS data as complete name and symbol
+//        RunTimeDataStore.ST2_Cndt2_Watchlists_Details.update_All_Watchlist_Data(Constants.TEXTFILE_PATH_FOR_F_AND_O_STOCKS_DETAILS);
 
     }
 

@@ -11,7 +11,7 @@ import java.time.Duration;
 
 public class SeleniumHelper extends BaseTest {
 
-//    public SeleniumHelper(WebDriver driver) {
+    //    public SeleniumHelper(WebDriver driver) {
 //        this.driver = driver;
 //    }
     public SeleniumHelper() {
@@ -142,6 +142,26 @@ public class SeleniumHelper extends BaseTest {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         } catch (Exception e) {
             System.out.println("JavaScript click failed: " + e.getMessage());
+        }
+    }
+
+    public boolean safeFindElement(By locator, int timeoutInSeconds) {
+        try {
+            if (timeoutInSeconds <= 0) {
+                // Temporarily set implicit wait to 0
+                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+                WebElement element = driver.findElement(locator);
+                return true;
+            } else {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+                wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+                return true;
+            }
+        } catch (NoSuchElementException | TimeoutException e) {
+            return false; // Element not found
+        } finally {
+            // Reset implicit wait to default (optional: set your framework default)
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         }
     }
 }

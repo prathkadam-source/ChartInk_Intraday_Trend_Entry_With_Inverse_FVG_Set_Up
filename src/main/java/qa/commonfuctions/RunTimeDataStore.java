@@ -114,4 +114,71 @@ public class RunTimeDataStore {
         }
         }
 
+    public class FAndO_Stocks_Details {
+
+        // Global HashMap accessible from anywhere
+        public static final HashMap<String, String> map = new HashMap<>();
+
+        // Method to get value by key
+        public static String getValue(String key) {
+            return map.get(key);
+        }
+
+        // Optional: Method to add/update key-value
+        public static void setValue(String key, String value) {
+            map.put(key, value);
+        }
+
+        // Optional: Check if key exists
+        public static boolean containsKey(String key) {
+            return map.containsKey(key);
+        }
+
+        // Optional: Check if key exists
+        public static String valueBasedOnParticularKeyText(String keyword) {
+            String value = "";
+            // Find and print value where key contains keyword
+            for (String key : map.keySet()) {
+                if (key.contains(keyword)) {
+                    value = map.get(key);
+                    System.out.println("Key: " + key + " → Value: " + value);
+                    // Optional: break if you only want the first match
+                    break;
+                }
+            }
+            return value;
+        }
+
+        public static void update_All_FAndO_Stocks_Data (String configFilePath) throws IOException {
+
+            ReportUtil.report(true, "INFO", "-- Function -- Starting -- update_All_FAndO_Stocks_Data function ", "");
+
+            String inputPath = configFilePath;
+            String wtlist_value = "";
+            String wtlist_Key = "";
+
+            try (FileInputStream fileInputStream = new FileInputStream(inputPath)) {
+
+                // load properties file in Properties
+                Properties FAndO_Stocks_Data  = new Properties();
+                FAndO_Stocks_Data.load(fileInputStream);
+
+                // Process each key
+                for (String key : FAndO_Stocks_Data.stringPropertyNames()) {
+                    wtlist_value = FAndO_Stocks_Data.getProperty(key);
+                    wtlist_Key = key;  // Example: Add "new_" prefix
+                    ST2_Cndt2_Watchlists_Details.setValue(wtlist_Key,wtlist_value);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error for update_All_FAndO_Stocks_Data : " + e.getMessage());
+                ReportUtil.report(false, "FAIL", "update_All_FAndO_Stocks_Data: ", "Error: " + e.getMessage());
+            }
+
+            ReportUtil.report(true, "INFO", "-- Function -- Ending -- update_All_FAndO_Stocks_Data function ", "");
+
+        }
+    }
+
     }

@@ -106,6 +106,8 @@ public class Constants {
 
     public static String TEXTFILE_PATH_FOR_ST2_CNDT2_WATCHLISTS_NAME_AND_URL = System.getProperty("user.dir") + "/src/main/resources/data/ST2_Cndt2_Watchlist_Names.properties";
 
+    public static String TEXTFILE_PATH_FOR_F_AND_O_STOCKS_DETAILS = System.getProperty("user.dir") + "/src/main/resources/data/FAndO_Stocks_Detail.properties";
+
     // Private constructor to prevent instantiation
     private Constants() {}
 }

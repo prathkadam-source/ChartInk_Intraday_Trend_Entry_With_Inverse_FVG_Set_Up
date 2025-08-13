@@ -49,7 +49,7 @@ public class MainTestCases  extends BaseTest{
         ReportUtil.report( true, "INFO", "-- TestCase -- Starting -- TestCase_2_Execute_Strategy_2_All_Conditions",  "");
 
         strategy_2_Test_Cases.Execute_Strategy_2_All_Conditions();
-        //test
+
 
         ReportUtil.report( true, "INFO", "-- TestCase -- Ending -- TestCase_2_Execute_Strategy_2_All_Conditions",  "");
 
