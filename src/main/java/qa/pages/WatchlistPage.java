@@ -474,6 +474,7 @@ public class WatchlistPage extends BaseTest {
 
                 //helper.safeClick(get_WebElement_Of_StockName_Of_Add_StockList(stockFullName));
                 helper.forceClickByJavaScript(get_WebElement_Of_StockName_Of_Add_StockList(stockFullName));
+                Thread.sleep(500);
 
                 if (helper.safeFindElement(WebElement_StockAddedToWatchlist_Text,2)) {
 
