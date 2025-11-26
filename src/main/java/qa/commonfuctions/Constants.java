@@ -58,6 +58,7 @@ public class Constants {
     //Text File related details
     public static final String DATA_FOLDER_PATH = System.getProperty("user.dir") + "/src/main/resources/data/";
     public static String TEXTFILE_PATH_ST1_CNDT2_WATCHLIST_UPDATES_FROM_CNDT_1 = "ST1_Cndt2_Watchlist_Updates_From_Cndt_1.txt";
+    public static String TEXTFILE_PATH_ST1_CNDT2_MAIN_HEADER_WATCHLIST_UPDATES_FROM_CNDT_1 = "ST1_Cndt2_Main_Header_Watchlist_Updates_From_Cndt_1.txt";
     public static String TEXTFILE_PATH_ST1_CNDT3_WATCHLIST_UPDATES = "ST1_Cndt3_Watchlist_Updates.txt";
     public static String TEXTFILE_PATH_ST2_CNDT2_WATCHLIST_UPDATES_FROM_CNDT_1 = "ST2_Cndt2_Watchlist_Updates_From_Cndt_1.txt";
     public static String TEXTFILE_PATH_ST2_CNDT3_WATCHLIST_UPDATES = "ST2_Cndt3_Watchlist_Updates.txt";
